@@ -1,56 +1,56 @@
 function [D_store,V] = GaussianBasis_Coef(S,u,b,sigma)
-% S : signal of size (nx,ny,nz,n)
-% u : sample gradient directions
-% b : b values
-%%%
-%%%%%%%% parameters  %%%%%%%%%%%%%%%%%%%
-if(nargin<4)
-    sigma=[0.0015 0.0008];
-end
-
-% CondNumber=1e7;
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-t = 70*1e-3;
-b=b(:);
-q = (1/(2*pi))*sqrt(b/t);
-qg=repmat(q,[1 3]).*u;
-
-if(length(size(S))==3)
-    [nx,ny,N]=size(S);
-else 
-    [nx,ny,nz,N]=size(S);
-    S=reshape(S,[nx,ny*nz,N]);
-    [nx,ny,N]=size(S);
-end
-
-[gg,~]=icosahedron(4); %gradient directions for ODF
-L=length(gg);
-
-    
-D_store=zeros(3,3,nx,ny);
-V=zeros(163,nx,ny);
-
-for ix=1:nx
-    parfor iy=1:ny
-        E=squeeze(S(ix,iy,:)); % change (ix,iy,1) to (ix,1,iy) for MGHdata
-        E=double(E);         
-        e=sort(E,'descend'); %
-        e0=mean(e(1:5));
-        if(e0>1)
-            E=E/e0; %
-        end
-        E(E>1)=1;
-        D0=EstTensor(qg,E);
-        D_store(:,:,ix,iy)=D0;
-        [A,B,c]=ConstructBasisMatrix(D0,qg,sigma);
-        lamb=0.00055;
-        opts = optimset('Algorithm','active-set','Display','off','MaxIter',1000);
-        v=quadprog(A'*A+lamb*eye(size(A,2)),-A'*E,-B,zeros(size(B,1),1),c,1,[],[],flipud(eye(size(A,2),1)),opts);    
-        V(:,ix,iy)=v; 
+    % S : signal of size (nx,ny,nz,n)
+    % u : sample gradient directions
+    % b : b values
+    %%%
+    %%%%%%%% parameters  %%%%%%%%%%%%%%%%%%%
+    if(nargin<4)
+        sigma=[0.0015 0.0008];
     end
-end
-
+    
+    % CondNumber=1e7;
+    %%%%%%%%%%%%%%%%%%%%%%%%%
+    %%
+    t = 70*1e-3;
+    b=b(:);
+    q = (1/(2*pi))*sqrt(b/t);
+    qg=repmat(q,[1 3]).*u;
+    
+    if(length(size(S))==3)
+        [nx,ny,N]=size(S);
+    else 
+        [nx,ny,nz,N]=size(S);
+        S=reshape(S,[nx,ny*nz,N]);
+        [nx,ny,N]=size(S);
+    end
+    
+    [gg,~]=icosahedron(4); %gradient directions for ODF
+    L=length(gg);
+    
+        
+    D_store=zeros(3,3,nx,ny);
+    V=zeros(163,nx,ny);
+    
+    for ix=1:nx
+        parfor iy=1:ny
+            E=squeeze(S(ix,iy,:)); % change (ix,iy,1) to (ix,1,iy) for MGHdata
+            E=double(E);         
+            e=sort(E,'descend'); %
+            e0=mean(e(1:5));
+            if(e0>1)
+                E=E/e0; %
+            end
+            E(E>1)=1;
+            D0=EstTensor(qg,E);
+            D_store(:,:,ix,iy)=D0;
+            [A,B,c]=ConstructBasisMatrix(D0,qg,sigma);
+            lamb=0.00055;
+            opts = optimset('Algorithm','active-set','Display','off','MaxIter',1000);
+            v=quadprog(A'*A+lamb*eye(size(A,2)),-A'*E,-B,zeros(size(B,1),1),c,1,[],[],flipud(eye(size(A,2),1)),opts);    
+            V(:,ix,iy)=v; 
+        end
+    end
+    
 end
 
 

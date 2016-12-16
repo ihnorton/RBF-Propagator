@@ -3,8 +3,6 @@ Other functions for NRRD/Nifti file reading and writing are also needed to run t
 One package for reading/writing Nifti files in Matlab can be downloaded via 
 http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 
-
-
 Demo.m	       the main file that illustrates how to use this package to collect scalar indices.
 
 CollectIndices.m 	       the file that computes scalar indices
@@ -30,6 +28,3 @@ ComputeKurtosis.m		computes the generalized-kurtosis (GK) and the non-isotropic-
 
 TestGaussianBasis.m		is used to check if there is bug in the code. If it returns 1, then the code is correct.
 TestData.mat			includes a set of measurements that is used in TestGaussianBasis.m to verify the code.
-
-
-
